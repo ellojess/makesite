@@ -1,28 +1,44 @@
 package main
 
-<<<<<<< HEAD
 import (
+	"fmt"
 	"io/ioutil"
 )
 
-func main() {
-
+type Data struct {
+	Content string
 }
 
-func readFile() string {
+func readFile() {
+	// read file 
 	fileContents, err := ioutil.ReadFile("first-post.txt")
 	if err != nil {
+		// A common use of `panic` is to abort if a function returns an error
+		// value that we don’t know how to (or want to) handle. This example
+		// panics if we get an unexpected error when creating a new file.
 		panic(err)
 	}
-
-	return string(fileContents)
+	fmt.Print(string(fileContents))
 }
 
-func renderTemplate()
-=======
-import "fmt"
+func writeFile() {
+	// write file 
+	bytesToWrite := []byte("hello\ngo\n")
+	err := ioutil.WriteFile("first-post.txt", bytesToWrite, 0644)
+	if err != nil {
+		panic(err)
+	}	
+}
+
+func writeTemplateToFilesystem() {
+	
+}
+
 
 func main() {
 	fmt.Println("Hello, world!")
+
+	readFile()
+	// writeFile()
+
 }
->>>>>>> 9514ac8a2c135a448a2b15a4b246dcd5d59ee7bf
