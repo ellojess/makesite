@@ -110,25 +110,27 @@ func renderTemplateFromPage(templateFilePath string, page Page) {
 }
 
 func main() {
+
 	// This flag represents the name of any `.txt` file in the same directory as your program.
 	// Run `./makesite --file=latest-post.txt` to test.
 	var textFilePath string
 	flag.StringVar(&textFilePath, "file", "", "Name or Path to a text file")
 	flag.Parse()
 
-	var txtFileFlag string
-	// This flag represents the name of any .txt file in the same
-	//directory as your program
-	flag.StringVar(&txtFileFlag, "file", "", "desciption: flag all txt files")
-
-	flag.Parse()
-	if txtFileFlag == "" {
-		print("it's empty")
+	// Make sure the `file` flag isn't blank.
+	if textFilePath == "" {
+		panic("Missing the --file flag! Please supply one.")
 	}
 
-	fmt.Println("TESTING: ", txtFileFlag)
+	// Read the provided text file and store it's information in a struct.
+	newPage := createPageFromTextFile(textFilePath)
 
-	fmt.Println("Hello, world!")
+	// Use the struct to generate a new HTML page based on the provided template.
+	renderTemplateFromPage("template.tmpl", newPage)
+
+	// fmt.Println("TESTING: ", txtFileFlag)
+
+	// fmt.Println("Hello, world!")
 
 	// readFile()
 	renderTemplate("template.tmpl", readFile("first-post.txt"))
