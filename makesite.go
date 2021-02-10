@@ -8,6 +8,9 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/mind1949/googletrans"
+	"golang.org/x/text/language"
 )
 
 type Content struct {
@@ -108,6 +111,31 @@ func renderTemplateFromPage(templateFilePath string, page Page) {
 	// saved inside the new file we created earlier.
 	t.Execute(newFile, page)
 	fmt.Println("✅ Generated File: ", page.HTMLPagePath)
+}
+
+func detect_language(filename string) {
+	
+	detected, err := googletrans.Detect(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	format := "language: %q, confidence: %0.2f\n"
+	fmt.Printf(format, detected.Lang, detected.Confidence)
+}
+
+func translate_text(filename string) {
+	params := googletrans.TranslateParams{
+		Src:  "auto",
+		Dest: language.SimplifiedChinese.String(),
+		// Text: "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software. ",
+		Text: filename,
+	}
+	translated, err := googletrans.Translate(params)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("text: %q \npronunciation: %q", translated.Text, translated.Pronunciation)
 }
 
 func main() {
