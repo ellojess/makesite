@@ -6,6 +6,7 @@ import (
 
 	"cloud.google.com/go/translate"
 	"golang.org/x/text/language"
+	"github.com/mind1949/googletrans"
     
 )
 
@@ -34,4 +35,29 @@ func translateText(targetLanguage, text string) (string, error) {
 			return "", fmt.Errorf("Translate returned empty response to text: %s", text)
 	}
 	return resp[0].Text, nil
+}
+
+func detect_language(filename string) {
+
+	detected, err := googletrans.Detect(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	format := "language: %q, confidence: %0.2f\n"
+	fmt.Printf(format, detected.Lang, detected.Confidence)
+}
+
+func translate_text(filename string) {
+	params := googletrans.TranslateParams{
+		Src:  "auto",
+		Dest: language.SimplifiedChinese.String(),
+		// Text: "Go is an open source programming language that makes it easy to build simple, reliable, and efficient software. ",
+		Text: filename,
+	}
+	translated, err := googletrans.Translate(params)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("text: %q \npronunciation: %q", translated.Text, translated.Pronunciation)
 }
