@@ -56,22 +56,22 @@ func writeFile(file string, data string) {
 // }
 
 //  Write the HTML template to the filesystem to a file. Name it first-post.html.
-func writeTemplateToFile(filename string, data string) {
-	t := template.Must(template.New("template.tmpl").ParseFiles(filename))
-	content := Content{Content: data}
-	f, err := os.Create("first-post.html")
-	if err != nil {
-		panic(err)
-	}
+// func writeTemplateToFile(filename string, data string) {
+// 	t := template.Must(template.New("template.tmpl").ParseFiles(filename))
+// 	content := Content{Content: data}
+// 	f, err := os.Create("first-post.html")
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-	err = t.Execute(f, content)
-	if err != nil {
-		panic(err)
-	}
+// 	err = t.Execute(f, content)
+// 	if err != nil {
+// 		panic(err)
+// 	}
 
-}
+// }
 
-func createPageFromTextFile(filePath string) Page {
+func createPageFromTextFile(lang string, filePath string) Page {
 	// Make sure we can read in the file first!
 	fileContents, err := ioutil.ReadFile(filePath)
 	if err != nil {
@@ -92,7 +92,7 @@ func createPageFromTextFile(filePath string) Page {
 	}
 }
 
-func renderTemplateFromPage(templateFilePath string, page Page) {
+func renderTemplateFromPage(lang string, templateFilePath string, page Page) {
 	// Create a new template in memory named "template.tmpl".
 	// When the template is executed, it will parse template.tmpl,
 	// looking for {{ }} where we can inject content.
@@ -177,7 +177,7 @@ func main() {
 
 	for _, file := range files {
 		fmt.Println(file.Name())
-		// writeTranslate(file.Name(), lang)
+		writeTranslate(file.Name(), lang)
 		createTranslatedPageFromTextFile(file.Name(), lang)
 
 	}
@@ -188,9 +188,9 @@ func main() {
 	}
 
 	// Read the provided text file and store it's information in a struct.
-	newPage := createPageFromTextFile(textFilePath)
+	newPage := createPageFromTextFile(lang, textFilePath)
 
 	// Use the struct to generate a new HTML page based on the provided template.
-	renderTemplateFromPage("template.tmpl", newPage)
+	renderTemplateFromPage(lang, "template.tmpl", newPage)
 
 }
