@@ -9,15 +9,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	// "github.com/mind1949/googletrans"
-	// "golang.org/x/text/language"
 )
 
+// Content represents the text in .txt files 
+// to be generated into HTML files 
 type Content struct {
 	Content string
 }
 
-// Ref: https://gist.github.com/droxey/5984bf42810ad53f03b9c465e1484449
+// Page referenced at https://gist.github.com/droxey/5984bf42810ad53f03b9c465e1484449
 // Page holds all the information we need to generate a new
 // HTML page from a text file on the filesystem.
 type Page struct {
@@ -45,157 +45,35 @@ func writeFile(file string, data string) {
 	}
 }
 
-//  Render contents of first-post.txt using Go Templates and print it to stdout
-// func renderTemplate(filename string, data string) {
-// 	t := template.Must(template.New("template.tmpl").ParseFiles(filename))
-// 	content := Content{Content: data}
-// 	err := t.Execute(os.Stdout, content)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
-
-//  Write the HTML template to the filesystem to a file. Name it first-post.html.
-// func writeTemplateToFile(filename string, data string) {
-// 	t := template.Must(template.New("template.tmpl").ParseFiles(filename))
-// 	content := Content{Content: data}
-// 	f, err := os.Create("first-post.html")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	err = t.Execute(f, content)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// }
-
-func createPageFromTextFile(lang string, filePath string) Page {
+func createTranslatedPageFromTextFile(lang string, filePath string) {
 	// Make sure we can read in the file first!
-	fileContents, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get the name of the file without `.txt` at the end.
-	// We'll use this later when naming our new HTML file.
-	fileNameWithoutExtension := strings.Split(filePath, ".txt")[0]
-
-	// Instantiate a new Page.
-	// Populate each field and return the data.
-	return Page{
-		TextFilePath: filePath,
-		TextFileName: fileNameWithoutExtension,
-		HTMLPagePath: fileNameWithoutExtension + ".html",
-		Content:      string(fileContents),
-	}
-}
-
-func renderTemplateFromPage(lang string, templateFilePath string, page Page) {
-	// Create a new template in memory named "template.tmpl".
-	// When the template is executed, it will parse template.tmpl,
-	// looking for {{ }} where we can inject content.
-	t := template.Must(template.New(templateFilePath).ParseFiles(templateFilePath))
-
-	// Create a new, blank HTML file.
-	newFile, err := os.Create(page.HTMLPagePath)
-	if err != nil {
-		panic(err)
-	}
-
-	// Executing the template injects the Page instance's data,
-	// allowing us to render the content of our text file.
-	// Furthermore, upon execution, the rendered template will be
-	// saved inside the new file we created earlier.
-	t.Execute(newFile, page)
-	fmt.Println("✅ Generated File: ", page.HTMLPagePath)
-}
-
-func writeTranslate(filename string, lang string) {
-
-	FileText := readFile(filename)
-
-	contents, error := translateText(lang, FileText)
-	if error != nil {
-		panic(error)
-	}
-	bytesToWrite := []byte(contents)
-
-	err := ioutil.WriteFile(filename, bytesToWrite, 0644)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func createTranslatedPageFromTextFile(filePath string, lang string) Page {
-
-	// Make sure we can read in the file first!
-	fileContents, err := ioutil.ReadFile(filePath)
-	if err != nil {
-		panic(err)
-	}
-
-	// Get the name of the file without `.txt` at the end.
-	// We'll use this later when naming our new HTML file.
-	fileNameWithoutExtension := strings.Split(filePath, ".txt")[0]
-
-	// Instantiate a new Page.
-	// Populate each field and return the data.
-	return Page{
-		TextFilePath: filePath,
-		TextFileName: fileNameWithoutExtension,
-		HTMLPagePath: fileNameWithoutExtension + ".html",
-		Content:      string(fileContents),
-	}
-}
-
-func main() {
-
-	// This flag represents the name of any `.txt` file in the same directory as your program.
-	// Run `./makesite --file=latest-post.txt` to test.
-	var textFilePath string
-	flag.StringVar(&textFilePath, "file", "", "Text file to turn into HTML page")
-	// flag.Parse()
-
-	//  flag to find all .txt files in the given directory
-	var dir string
-	flag.StringVar(&dir, "dir", "", "Directory with text files & converted HTML files")
-	// flag.Parse()
-	fmt.Println("Directory: ", dir)
-
-	// flag to choose tranlation
-	var lang string
-	flag.StringVar(&lang, "lang", "zh", "This is the language you want to translate, inputting google's language abbreviations.")
-	flag.Parse()
-	fmt.Println("Language:", lang)
-
-	files, err := ioutil.ReadDir(dir)
+	files, err := ioutil.ReadDir(filePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, file := range files {
-		// fmt.Println(file.Name())
 
 		fmt.Println(filepath.Ext(file.Name()))
 
-		// writeTranslate(file.Name(), lang)
-		// createTranslatedPageFromTextFile(file.Name(), lang)
-
+		// Get the name of the file without `.txt` at the end.
+		// Use this later when naming new HTML file.
 		if filepath.Ext(file.Name()) == ".txt" {
 			fileContents := readFile(file.Name())
 			translated, err := translateText(lang, fileContents)
 
+			// Instantiate a new Page.
+			// Populate each field with data
 			var page Page
 			page.Content = translated
 
 			if err != nil {
 				log.Fatal(err)
-
 			}
 
+			// Create a new template in memory named "template.tmpl".
+			// When the template is executed, it will parse template.tmpl,
+			// looking for {{ }} where we can inject content.
 			t := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
 
 			// Create a new, blank HTML file.
@@ -205,25 +83,24 @@ func main() {
 				panic(err)
 			}
 
+			// Executing the template injects the Page instance's data,
+			// allowing us to render the content of our text file.
+			// Furthermore, upon execution, the rendered template will be
+			// saved inside the new file we created earlier.
 			err = t.Execute(newFile, page)
 			if err != nil {
 				log.Fatal(err)
-
 			}
-
 		}
-
 	}
+}
 
-	// // Make sure the `file` flag isn't blank.
-	// if textFilePath == "" {
-	// 	panic("Missing the --file flag! Please supply one.")
-	// }
+func main() {
+	var dir string  // flag to find all .txt files in the given directory
+	var lang string // flag to choose tranlation
+	flag.StringVar(&dir, "dir", "", "Directory with text files & converted HTML files")
+	flag.StringVar(&lang, "lang", "zh", "This is the language you want to translate, inputting google's language abbreviations.")
+	flag.Parse()
 
-	// // Read the provided text file and store it's information in a struct.
-	// newPage := createPageFromTextFile(lang, textFilePath)
-
-	// // Use the struct to generate a new HTML page based on the provided template.
-	// renderTemplateFromPage(lang, "template.tmpl", newPage)
-
+	createTranslatedPageFromTextFile(lang, dir)
 }
