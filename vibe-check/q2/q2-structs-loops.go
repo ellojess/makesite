@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// House represents the 
 type House struct {
 	numberOfRooms int
 	city          string
@@ -15,15 +16,13 @@ type House struct {
 
 //  allow users to enter information for one to many houses
 func getHouseData() []House {
-
 	var house House
 	var address, city string
 	var numberOfRooms, price int
-
+	
 	// shoutout to Jerome for suggesting check implementation
 	var check int
 	check = 0
-
 	reader := bufio.NewReader(os.Stdin)
 
 	// list of dictionaries to store houses info

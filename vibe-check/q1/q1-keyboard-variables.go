@@ -8,16 +8,16 @@ import (
 // using a provided date of birth and age.
 // HINT: Get the date of birth and age from stdin!
 func calcYearBorn() {
-	var birth_year int
+	var birthYear int
 	var age int
 
 	fmt.Println("Enter your year of birth: ")
-	fmt.Scanln(&birth_year)
+	fmt.Scanln(&birthYear)
 
 	fmt.Println("Enter your current age: ")
 	fmt.Scanln(&age)
 
-	year := birth_year + age
+	year := birthYear + age
 
 	fmt.Println("\nThe year is ", year)
 
