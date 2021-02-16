@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	// "github.com/mind1949/googletrans"
 	// "golang.org/x/text/language"
@@ -166,7 +167,7 @@ func main() {
 
 	// flag to choose tranlation
 	var lang string
-	flag.StringVar(&lang, "lang", "es", "This is the language you want to translate, inputting google's language abbreviations.")
+	flag.StringVar(&lang, "lang", "zh", "This is the language you want to translate, inputting google's language abbreviations.")
 	flag.Parse()
 	fmt.Println("Language:", lang)
 
@@ -176,21 +177,53 @@ func main() {
 	}
 
 	for _, file := range files {
-		fmt.Println(file.Name())
-		writeTranslate(file.Name(), lang)
-		createTranslatedPageFromTextFile(file.Name(), lang)
+		// fmt.Println(file.Name())
+
+		fmt.Println(filepath.Ext(file.Name()))
+
+		// writeTranslate(file.Name(), lang)
+		// createTranslatedPageFromTextFile(file.Name(), lang)
+
+		if filepath.Ext(file.Name()) == ".txt" {
+			fileContents := readFile(file.Name())
+			translated, err := translateText(lang, fileContents)
+
+			var page Page
+			page.Content = translated
+
+			if err != nil {
+				log.Fatal(err)
+
+			}
+
+			t := template.Must(template.New("template.tmpl").ParseFiles("template.tmpl"))
+
+			// Create a new, blank HTML file.
+			newFile, err := os.Create(strings.Split(file.Name(), ".txt")[0] + ".html")
+
+			if err != nil {
+				panic(err)
+			}
+
+			err = t.Execute(newFile, page)
+			if err != nil {
+				log.Fatal(err)
+
+			}
+
+		}
 
 	}
 
-	// Make sure the `file` flag isn't blank.
-	if textFilePath == "" {
-		panic("Missing the --file flag! Please supply one.")
-	}
+	// // Make sure the `file` flag isn't blank.
+	// if textFilePath == "" {
+	// 	panic("Missing the --file flag! Please supply one.")
+	// }
 
-	// Read the provided text file and store it's information in a struct.
-	newPage := createPageFromTextFile(lang, textFilePath)
+	// // Read the provided text file and store it's information in a struct.
+	// newPage := createPageFromTextFile(lang, textFilePath)
 
-	// Use the struct to generate a new HTML page based on the provided template.
-	renderTemplateFromPage(lang, "template.tmpl", newPage)
+	// // Use the struct to generate a new HTML page based on the provided template.
+	// renderTemplateFromPage(lang, "template.tmpl", newPage)
 
 }

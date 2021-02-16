@@ -24,9 +24,10 @@
 /Godeps/
 
 # credentials file for Google Cloud API for
-makesite/makesite-b3b553b4bf4b.json
-makesite-b3b553b4bf4b.json
-/makesite/makesite-b3b553b4bf4b.json
+makesite/makesite-7276b1b2a559.json
+makesite-7276b1b2a559.json
+/makesite/makesite-7276b1b2a559.json
+
 
 
 # End of https://www.gitignore.io/api/go
